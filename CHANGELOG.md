@@ -3,6 +3,13 @@
 Le versioni seguono il formato MAGGIORE.MINORE.CORREZIONE. Ogni versione riporta la data a cui sono
 stati verificati i riferimenti normativi in `green-claims-it/references/`.
 
+## [1.0.1] – 25/11/2026
+**Corretto**: nel passo 1 le pagine di un sito si leggono in sequenza, con una pausa tra le
+richieste, e si scartano le pagine di errore (es. stato 508 degli hosting condivisi), che
+altrimenti verrebbero analizzate come contenuto del sito.
+
+**Riferimenti verificati**: invariati rispetto alla 1.0.0 (17-18/11/2026).
+
 ## [1.0.0] – 18/11/2026
 Prima versione pubblica.
 

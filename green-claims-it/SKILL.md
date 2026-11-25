@@ -40,7 +40,11 @@ Riepiloga il perimetro e chiedi conferma.
 
 ## Passo 1 — Raccolta ed estrazione dei claim
 1. Leggi ogni fonte e annota URL, lingua e data di consultazione. Segna le parti non lette (pagine
-   troncate, testi dentro immagini, contenuti che richiedono accesso).
+   troncate, testi dentro immagini, contenuti che richiedono accesso). Le pagine di un sito si
+   leggono **in sequenza, con una pausa tra le richieste** (circa 2 secondi): sugli hosting
+   condivisi le richieste in parallelo superano il limite del piano e il sito risponde con pagine
+   di errore (es. stato 508). Controlla che il testo letto non sia una pagina di errore prima di
+   estrarre i claim.
 2. Estrai **ogni** asserzione ambientale secondo le regole di `classificazione.md` (anche loghi,
    immagini, nomi di prodotto e di linea). Numera C01, C02… con fonte e lingue. Le affermazioni su
    terzi vanno nel perimetro come «fuori ambito».
