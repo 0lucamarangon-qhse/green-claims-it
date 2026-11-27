@@ -8,7 +8,7 @@
 >   https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:decreto.legislativo:2026-02-20;30
 > - D.Lgs. 2 agosto 2007, n. 145:
 >   https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:decreto.legislativo:2007-08-02;145
-> **Verificato il**: 17/11/2026 — se sono passati più di 6 mesi, riscontrare le fonti prima di citarle.
+> **Verificato il**: 17/11/2026; art. 18, lett. c) e art. 19, c. 3: 26/11/2026 — se sono passati più di 6 mesi, riscontrare le fonti prima di citarle.
 > **Riuso**: i testi degli atti ufficiali dello Stato non sono protetti dal diritto d'autore (art. 5
 > L. 633/1941). Estratti senza modifiche; omissioni indicate con […].
 
@@ -18,11 +18,19 @@
 | D.Lgs. 2 agosto 2007, n. 146 (GU n. 207 del 06/09/2007), in vigore dal 21/09/2007 | Recepisce la Dir. 2005/29/CE: sostituisce gli artt. 18-27 del Codice del consumo |
 | D.Lgs. 20 febbraio 2026, n. 30 (GU n. 56 del 09/03/2026), in vigore dal 24/03/2026 | Recepisce la Dir. (UE) 2024/825. Art. 2, c. 1: «Le disposizioni del presente decreto si applicano a decorrere dal 27 settembre 2026» |
 
-## Ambito (art. 19, c. 1)
-«Il presente titolo si applica alle pratiche commerciali scorrette tra professionisti e consumatori
+## Ambito (art. 19)
+**Comma 1**: «Il presente titolo si applica alle pratiche commerciali scorrette tra professionisti e consumatori
 […], nonché alle pratiche commerciali scorrette tra professionisti e microimprese. Per le microimprese la
 tutela in materia di pubblicità ingannevole e di pubblicità comparativa illecita è assicurata in via
 esclusiva dal decreto legislativo 2 agosto 2007, n. 145.»
+- **Conseguenza per le microimprese**: per la pubblicità ingannevole e comparativa (quindi per le
+  asserzioni nella comunicazione promozionale) la base è il D.Lgs. 145/2007, non gli artt. 21-23 del
+  Codice; il Codice resta per le altre pratiche commerciali scorrette. Comma in vigore dal 25/03/2012,
+  non modificato dal D.Lgs. 30/2026.
+- **Comma 3**: «In caso di contrasto, le disposizioni contenute in direttive o in altre disposizioni
+  comunitarie e nelle relative norme nazionali di recepimento che disciplinano aspetti specifici delle
+  pratiche commerciali scorrette prevalgono sulle disposizioni del presente titolo e si applicano a tali
+  aspetti specifici.»
 - **Microimprese** (art. 18, lett. d-bis): meno di dieci persone e fatturato annuo o totale di bilancio
   annuo non superiori a due milioni di euro.
 - Rispetto alla direttiva, l'Italia estende la tutela alle microimprese: anche un'azienda che vende solo
@@ -35,6 +43,7 @@ Il Codice usa «etichetta di sostenibilità» dove la direttiva dice «marchio d
 
 | Lett. | Termine | Corrisponde a (direttiva art. 2) |
 |---|---|---|
+| c | prodotto: «qualsiasi bene o servizio, compresi i beni immobili, i servizi digitali e il contenuto digitale, nonché i diritti e gli obblighi» (definizione preesistente) | lett. c |
 | n-quater | asserzione ambientale | lett. o |
 | n-quinquies | asserzione ambientale generica | lett. p |
 | n-sexies | etichetta di sostenibilità | lett. q |

@@ -18,12 +18,16 @@ contenuto.json:
     {"tipo": "bullet", "testo": "..."},
     {"tipo": "avvertenza", "testo": "corsivo grigio"},
     {"tipo": "tabella", "larghezze": [2000, 3000, ...], "righe": [["intestazione", ...], [...]],
-     "dimensione": 17}
+     "dimensione": 15}
   ]
 }
 
 Convenzioni:
-- **testo** = grassetto; [testo] = evidenziato in giallo (dato mancante o da verificare).
+- **testo** = grassetto; [testo] = evidenziato in giallo (dato mancante o da verificare);
+  le omissioni nelle citazioni, […] o [...], non vengono evidenziate.
+- "dimensione" = corpo del testo della tabella in mezzi punti, intero (15 = 7,5 pt); predefinito 16.
+- ogni riga di tabella deve avere tante celle quante sono le larghezze: il JSON viene controllato
+  prima di costruire il documento e lo script si ferma indicando il blocco da correggere.
 - nelle tabelle, una cella che contiene esattamente «Consentito», «Da approfondire» o
   «Non consentito» viene colorata (verde, ambra, rosso).
 - la prima riga di ogni tabella è l'intestazione e si ripete a ogni pagina.
@@ -35,11 +39,21 @@ from docx.oxml import parse_xml
 
 W = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
 FASCE = {'consentito': 'C6EFCE', 'da approfondire': 'FFE699', 'non consentito': 'FFC7CE'}
+
+
+def fascia(testo):
+    """Colore della fascia: tolti emoji e simboli, il testo della cella deve coincidere con il nome
+    della fascia («✅ Consentito» sì, una frase che contiene «consentito» no)."""
+    return FASCE.get(' '.join(re.sub(r'[^\w\s]', ' ', testo.lower()).split()))
+
+
 GRIGIO = '6B6B6B'
 TESTO = '222222'
 TOKEN = {'titolo': 'TITOLO', 'sottotitolo': 'SOTTOTITOLO', 'h1': 'H1', 'h2': 'H2',
          'p': 'BODY', 'bullet': 'BULLET', 'avvertenza': 'BODY'}
-SPLIT = re.compile(r'(\*\*.+?\*\*|\[[^\]]+\])')
+SPLIT = re.compile(r'(\*\*.+?\*\*|\[(?!\s*(?:…|\.\.\.)\s*\])[^\]]+\])')
+CONTROLLO = re.compile(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]')
+TIPI = {'titolo', 'sottotitolo', 'h1', 'h2', 'p', 'bullet', 'avvertenza', 'tabella'}
 
 
 ORDINE = ['rStyle', 'rFonts', 'b', 'bCs', 'i', 'iCs', 'caps', 'smallCaps', 'strike', 'dstrike', 'outline',
@@ -60,7 +74,33 @@ def ordina(rp):
 
 
 def esc(s):
+    s = CONTROLLO.sub('', s)
     return s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+
+
+def valida(c):
+    """Controlla il JSON prima di costruire il documento; in caso di errore si ferma con un messaggio."""
+    if not isinstance(c, dict) or not isinstance(c.get('blocchi'), list) or not c['blocchi']:
+        sys.exit('JSON non valido: manca "blocchi" (lista non vuota)')
+    for i, b in enumerate(c['blocchi']):
+        t = b.get('tipo') if isinstance(b, dict) else None
+        if t not in TIPI:
+            sys.exit(f'blocco {i}: tipo non valido: {t!r} (ammessi: {", ".join(sorted(TIPI))})')
+        if t == 'tabella':
+            L, R = b.get('larghezze'), b.get('righe')
+            if not (isinstance(L, list) and L and all(isinstance(w, int) and w > 0 for w in L)):
+                sys.exit(f'blocco {i}: "larghezze" deve essere una lista di interi positivi')
+            if not (isinstance(R, list) and R):
+                sys.exit(f'blocco {i}: "righe" deve essere una lista non vuota')
+            for j, r in enumerate(R):
+                if not isinstance(r, list) or len(r) != len(L):
+                    trovate = len(r) if isinstance(r, list) else type(r).__name__
+                    sys.exit(f'blocco {i}, riga {j}: attese {len(L)} celle, trovate {trovate}')
+            sz = b.get('dimensione', 16)
+            if not isinstance(sz, int) or not 8 <= sz <= 48:
+                sys.exit(f'blocco {i}: "dimensione" deve essere un intero in mezzi punti tra 8 e 48')
+        elif not isinstance(b.get('testo'), str):
+            sys.exit(f'blocco {i}: "testo" mancante o non è una stringa')
 
 
 def carica(modello):
@@ -106,11 +146,12 @@ def paragrafo(d, proto, tipo, testo):
 
 
 def cella(w, testo, intestazione, sz):
-    fill = '404040' if intestazione else FASCE.get(testo.strip().lower())
+    testo = str(testo)
+    fill = '404040' if intestazione else fascia(testo)
     shd = f'<w:shd w:val="clear" w:color="auto" w:fill="{fill}"/>' if fill else ''
     colore = 'FFFFFF' if intestazione else TESTO
     paras = ''
-    for riga in str(testo).split('\n'):
+    for riga in testo.split('\n'):
         runs = ''
         for parte in SPLIT.split(riga):
             if not parte:
@@ -127,7 +168,7 @@ def cella(w, testo, intestazione, sz):
     return f'<w:tc><w:tcPr><w:tcW w:w="{w}" w:type="dxa"/>{shd}</w:tcPr>{paras}</w:tc>'
 
 
-def tabella(d, proto, larghezze, righe, sz=17):
+def tabella(d, proto, larghezze, righe, sz=16):
     grid = ''.join(f'<w:gridCol w:w="{w}"/>' for w in larghezze)
     bordi = ''.join(f'<w:{s} w:val="single" w:sz="4" w:space="0" w:color="BFBFBF"/>'
                     for s in ('top', 'left', 'bottom', 'right', 'insideH', 'insideV'))
@@ -147,7 +188,9 @@ def tabella(d, proto, larghezze, righe, sz=17):
 
 def intestazione(d, testo, data):
     for s in d.sections:
-        for part in (s.header, s.first_page_header):
+        # l'intestazione di prima pagina si tocca solo se il modello la prevede: leggerla la crea
+        parti = [s.header] + ([s.first_page_header] if s.different_first_page_header_footer else [])
+        for part in parti:
             for t in part._element.iter(qn('w:t')):
                 if not t.text:
                     continue
@@ -158,20 +201,32 @@ def intestazione(d, testo, data):
 
 
 def main():
+    if len(sys.argv) < 3:
+        sys.exit('Uso: genera_report.py contenuto.json output.docx [modello.docx]')
     src, out = sys.argv[1], sys.argv[2]
     modello = sys.argv[3] if len(sys.argv) > 3 else os.path.join(
         os.path.dirname(os.path.abspath(__file__)), '..', 'assets', 'modello_report.docx')
-    c = json.load(open(src, encoding='utf-8'))
+    if os.path.exists(out):
+        sys.exit(f'Il file esiste già: {out} (scegli un nome di revisione)')
+    cartella = os.path.dirname(os.path.abspath(out))
+    if not os.path.isdir(cartella):
+        sys.exit(f'La cartella di destinazione non esiste: {cartella}')
+    if not os.path.isfile(modello):
+        sys.exit(f'Modello non trovato: {modello}')
+    try:
+        with open(src, encoding='utf-8') as f:
+            c = json.load(f)
+    except (OSError, json.JSONDecodeError) as e:
+        sys.exit(f'Impossibile leggere il JSON {src}: {e}')
+    valida(c)
     d, proto = carica(modello)
     intestazione(d, c.get('intestazione', 'Verifica asserzioni ambientali'), c.get('data', ''))
     d.core_properties.title = c.get('titolo_documento', '')
     for b in c['blocchi']:
         if b['tipo'] == 'tabella':
-            tabella(d, proto, b['larghezze'], b['righe'], b.get('dimensione', 17))
+            tabella(d, proto, b['larghezze'], b['righe'], b.get('dimensione', 16))
         else:
             paragrafo(d, proto, b['tipo'], b['testo'])
-    if os.path.exists(out):
-        sys.exit(f'Il file esiste già: {out} (scegli un nome di revisione)')
     d.save(out)
     print('ok', out)
 
